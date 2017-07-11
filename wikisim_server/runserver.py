@@ -74,7 +74,7 @@ class Server(object):
         self.k = k
 
         self.index_annoy = annoy.AnnoyIndex(500, metric='angular')
-        self.index_annoy.load(os.path.join(basedir, 'index3507620_annoy_100'))
+        self.index_annoy.load(os.path.join(basedir, 'index4278026_annoy_100'))
         self.id2title = gensim.utils.unpickle(os.path.join(basedir, 'id2title'))
         self.title2id = dict((gensim.utils.to_unicode(title).lower(), pos) for pos, title in enumerate(self.id2title))
 
@@ -91,7 +91,7 @@ class Server(object):
         if title in self.title2id:
             logger.info("finding similars for %s" % title)
             query = self.title2id[title]  # convert query from article name (string) to index id (int)
-            nn = self.index_annoy.get_nns_by_item(query, self.k)
+            nn = self.index_annoy.get_nns_by_item(query, 100)
             result = [self.id2title[pos2] for pos2 in nn]  # convert top10 from ids back to article names
             logger.info("similars to %s: %s" % (title, result))
         else:
@@ -149,7 +149,7 @@ if __name__ == '__main__':
     if config_srv.run_user and config_srv.run_group:
         logging.info("dropping priviledges to %s:%s" % (config_srv.run_user, config_srv.run_group))
         DropPrivileges(cherrypy.engine, gid=config_srv.run_group, uid=config_srv.run_user).subscribe()
-
+    logging.info("base directory %s" % config.BASE_DIR)
     cherrypy.quickstart(Server(config.BASE_DIR, config.TOPN), config=conf_file)
 
     logging.info("finished running %s" % program)

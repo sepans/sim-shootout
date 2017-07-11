@@ -19,7 +19,7 @@ if [ ! -e $articles ]; then
 	wiki_file=$datadir/enwiki-latest-pages-articles.xml.bz2
 	if [ ! -e $wiki_file ]; then
 		echo "downloading wiki dump to $wiki_file"
-		wget -O $wiki_file 'http://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles.xml.bz2'
+#		wget -O $wiki_file 'http://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles.xml.bz2'
 	fi
 	./prepare_shootout.py $wiki_file $datadir 2>&1 | tee ./log_prepare.txt
 	gzip -v $datadir/lsi_vectors.mm
@@ -38,7 +38,7 @@ run_combinations () {
 
 # then create indexes for the various libraries & take accuracy measurements
 ks="1 10 100 1000"
-OPENBLAS_NUM_THREADS=1 run_combinations "gensim" "exact" $ks
-run_combinations "annoy" "1 10 50 100 500" $ks
-run_combinations "flann" "7 9 99" $ks
-run_combinations "kgraph" "default" $ks
+# OPENBLAS_NUM_THREADS=1 run_combinations "gensim" "exact" $ks
+run_combinations "annoy" "50 100 500" $ks
+# run_combinations "flann" "7 9 99" $ks
+# run_combinations "kgraph" "default" $ks

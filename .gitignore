@@ -18,9 +18,14 @@ develop-eggs
 lib
 lib64
 __pycache__
+venv
 
 # Installer logs
 pip-log.txt
+
+# Logs
+log/
+log_
 
 # Unit test / coverage reports
 .coverage
@@ -34,3 +39,6 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+# misc
+.*.swp
