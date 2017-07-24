@@ -1,9 +1,10 @@
 cherrypy
+cherrypy-cors
 numpy
 scipy
 Cython
 Bottleneck
-#annoy==1.0
+annoy==1.0
 #flann==1.8.4
 ipython
 scikit-learn

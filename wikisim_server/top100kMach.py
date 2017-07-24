@@ -93,7 +93,7 @@ class Server(object):
         #logger.info("first 5 wiki ids %s" % self.wikiidlist[0:20])
         #logger.info("first 5 wiki values %s" % wikiid2title.values()[0:20])
         self.title2id = dict((gensim.utils.to_unicode(title).lower(), pos) for pos, title in enumerate(self.id2title))
-        with open(os.path.dirname(os.path.abspath(__file__)) + '/withids.json') as withidsfile:
+        with open(os.path.dirname(os.path.abspath(__file__)) + '/rasteredxx.json') as withidsfile:
             self.withids = json.load(withidsfile)
             for i in range(0, 10):
                 key = list(self.withids.keys())[i]
@@ -106,6 +106,11 @@ class Server(object):
         self.hundredKIdsSet = set(hundredKIds)
         logger.info("set built")
     
+    def getXCoord(self, d):
+	return d["x"]
+
+    def getYCoord(self, d):
+	return d["y"]
     
     def findMatchingSet(self, query, qSize):
         nn = self.index_annoy.get_nns_by_item(query, qSize)
@@ -125,12 +130,14 @@ class Server(object):
             logger.info('query in intersection')
             queryWikiid = self.wikiidlist[query]
             logger.info("queryWikiid %s " % queryWikiid)
-            midPoint = [self.withids[queryWikiid]["x"], self.withids[queryWikiid]["y"]]
+            logger.info("queryWikiid %s " % self.withids[queryWikiid])
+            midPoint = [self.getXCoord(self.withids[queryWikiid]), self.getYCoord(self.withids[queryWikiid])]
             return midPoint
         intersectionWikiIds = [self.wikiidlist[p] for p in intersection]
         logger.info("intersectionWikiIds %s" %intersectionWikiIds)
-        x = [float(self.withids[str(self.wikiidlist[p])]["x"]) for p in intersection[:3]]
-        y = [float(self.withids[str(self.wikiidlist[p])]["y"]) for p in intersection[:3]]
+        intersection = intersection[:3]
+	x = [float(self.getXCoord(self.withids[str(self.wikiidlist[p])])) for p in intersection]
+        y = [float(self.getYCoord(self.withids[str(self.wikiidlist[p])])) for p in intersection]
         print(x)
         print(y)
         centroid = [sum(x) / len(intersection), sum(y) / len(intersection)]
@@ -152,7 +159,8 @@ class Server(object):
 
         """
         title = gensim.utils.to_unicode(kwargs.pop('title', u'')).lower()
-        logger.info("finding similars for %s" % title)
+        useRastered = kwargs.pop('rastered', u'')
+	logger.info("finding similars for %s" % title)
         if title in self.title2id:
             query = self.title2id[title]  # convert query from article name (string) to index id (int)
             logger.info("query %s" % query)
@@ -164,7 +172,7 @@ class Server(object):
             logger.info("in? int %s " % (int(queryWikiid) in self.hundredKIdsSet))
             if queryWikiid in self.hundredKIdsSet:
                 logger.info(self.withids[queryWikiid])
-                miPoint = [self.withids[queryWikiid]["x"], self.withids[queryWikiid]["y"]]
+                miPoint = [self.getXCoord(self.withids[queryWikiid]), self.getYCoord(self.withids[queryWikiid])]
             else:
                 qSize = 100
                 intersection = self.findMatchingSet(query, qSize)
@@ -198,6 +206,12 @@ class Server(object):
         }
         return result
     ping = status
+
+    @cherrypy.expose
+    def index(self):
+	REACT_DIR = os.path.abspath(os.path.dirname(__file__))
+	return open(os.path.join(REACT_DIR, u'index.html'))
+
 #endclass Server
 
 
