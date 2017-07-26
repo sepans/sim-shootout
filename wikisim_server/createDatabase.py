@@ -8,15 +8,15 @@ if __name__ == '__main__':
 	basedir = sys.argv[1]
 	print("basedir %s" % basedir)
 
-	createTable = 0
-	insertTable = 0
+	createTable = 1
+	insertTable = 1
 
 
 	conn = sqlite3.connect('annoy.db')
 	c = conn.cursor()
 	
 	if createTable:
-		c.execute("DROP TABLE annoy_map")
+		c.execute("DROP TABLE IF EXISTS annoy_map")
 		c.execute('''CREATE TABLE annoy_map
 	              (annoy_id integer, title text, wiki_id integer)''')
 
